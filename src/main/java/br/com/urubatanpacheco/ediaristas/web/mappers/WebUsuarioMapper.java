@@ -1,26 +1,18 @@
 package br.com.urubatanpacheco.ediaristas.web.mappers;
 
-public class WebUsuarioMapper {
-/*     public Usuario toModel(ServicForm form) {
-        var model = new Servico();
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-        if (form == null) {
-            throw new IllegalArgumentException();
-        }
+import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
+import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioCadastroForm;
 
-  
-        return model;
-    }
+@Mapper(componentModel = "spring")
+public interface WebUsuarioMapper {
 
-    public ServicoForm toForm(Servico model) {
-        var form = new ServicoForm();
+    WebUsuarioMapper INSTANCE =  Mappers.getMapper(WebUsuarioMapper.class);
 
-        if (model == null) {
-            throw new IllegalArgumentException();
-        }
+    Usuario toModel(UsuarioCadastroForm form);
+    UsuarioCadastroForm toForm(Usuario model);
 
-  
-        return form;
-    }
-*/    
+    
 }
