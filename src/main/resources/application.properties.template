@@ -6,6 +6,7 @@ spring.datasource.password=senha
  
 # Hibernate e JPA
 spring.jpa.hibernate.ddl-auto=update
+spring.jpa.hibernate.naming.implicit-strategy=org.hibernate.boot.model.naming.ImplicitNamingStrategyComponentPathImpl
 
 
 # Hibernate e JPA - ambiente de desenvolvimento

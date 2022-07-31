@@ -1,12 +1,14 @@
 package br.com.urubatanpacheco.ediaristas.web.mappers;
 
 
+import org.springframework.stereotype.Component;
+
 import br.com.urubatanpacheco.ediaristas.core.models.Servico;
 import br.com.urubatanpacheco.ediaristas.web.dtos.ServicoForm;
 
-
+@Component
 public class WebServicoMapper {
-    public static Servico toModel(ServicoForm form) {
+    public Servico toModel(ServicoForm form) {
         var model = new Servico();
 
         if (form == null) {
@@ -36,7 +38,7 @@ public class WebServicoMapper {
         return model;
     }
 
-    public static ServicoForm toForm(Servico model) {
+    public ServicoForm toForm(Servico model) {
         var form = new ServicoForm();
 
         if (model == null) {

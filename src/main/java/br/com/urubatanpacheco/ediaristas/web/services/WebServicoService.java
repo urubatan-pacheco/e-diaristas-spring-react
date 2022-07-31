@@ -17,12 +17,16 @@ public class WebServicoService {
     @Autowired
     private ServicoRepository repository;
 
+    @Autowired
+    private WebServicoMapper mapper;
+
+
     public List<Servico> buscarTodos() {
         return repository.findAll();
     }
 
     public Servico cadastrar(ServicoForm form) {
-        var model = WebServicoMapper.toModel(form);
+        var model = mapper.toModel(form);
 
         return repository.save(model);
     }
@@ -41,7 +45,7 @@ public class WebServicoService {
     public Servico editar(ServicoForm form, Long id) {
         var servico = buscarPorId(id);
 
-        var model = WebServicoMapper.toModel(form);
+        var model = mapper.toModel(form);
         model.setId(servico.getId());
 
         return repository.save(model);
