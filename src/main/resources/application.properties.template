@@ -1,0 +1,15 @@
+# Datasource
+spring.datasource.url=jdbc:mysql://host:porta/banco_de_dados?useTimezone=true&serverTimezone=America/Sao_Paulo
+spring.datasource.username=root
+spring.datasource.password=senha
+
+ 
+# Hibernate e JPA
+spring.jpa.hibernate.ddl-auto=update
+
+
+# Hibernate e JPA - ambiente de desenvolvimento
+spring.jpa.show-sql=true
+
+# Thymeleaf - ambiente de desenvolvimento
+spring.thymeleaf.cache=false
