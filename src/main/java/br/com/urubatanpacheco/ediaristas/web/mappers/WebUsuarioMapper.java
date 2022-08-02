@@ -5,6 +5,7 @@ import org.mapstruct.factory.Mappers;
 
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioCadastroForm;
+import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioEdicaoForm;
 
 @Mapper(componentModel = "spring")
 public interface WebUsuarioMapper {
@@ -12,7 +13,10 @@ public interface WebUsuarioMapper {
     WebUsuarioMapper INSTANCE =  Mappers.getMapper(WebUsuarioMapper.class);
 
     Usuario toModel(UsuarioCadastroForm form);
-    UsuarioCadastroForm toForm(Usuario model);
+
+    Usuario toModel(UsuarioEdicaoForm form);
+    
+    UsuarioEdicaoForm toForm(Usuario model);
 
     
 }

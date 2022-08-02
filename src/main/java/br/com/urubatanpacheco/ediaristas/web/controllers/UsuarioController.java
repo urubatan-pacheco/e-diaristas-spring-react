@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import br.com.urubatanpacheco.ediaristas.core.exceptions.ValidacaoException;
 import br.com.urubatanpacheco.ediaristas.web.dtos.FlashMessage;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioCadastroForm;
+import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioEdicaoForm;
 import br.com.urubatanpacheco.ediaristas.web.services.WebUsuarioService;
 
 @Controller
@@ -49,9 +51,46 @@ public class UsuarioController {
             return "admin/usuario/cadastro-form";        
         }
 
+        try {
         service.cadastrar(form);
         // FlashMessage atrtribute alert tratado no usuario/lista.html
         attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário cadastrado com sucesso!"));
+
+        } catch(ValidacaoException e) {
+            result.addError(e.getFieldError());
+            return "admin/usuario/cadastro-form";
+
+        }
+    
+
+        return "redirect:/admin/usuarios";
+    }    
+
+    @GetMapping("/{id}/editar")
+    public ModelAndView editar(@PathVariable Long id, RedirectAttributes attrs) {
+        var modelAndView = new ModelAndView("admin/usuario/edicao-form");
+
+        modelAndView.addObject("form", service.buscarFormPorId(id) );
+        
+        return modelAndView;
+    }
+     
+    @PostMapping("/{id}/editar")
+    public String editar( @PathVariable Long id, @Valid @ModelAttribute("form") UsuarioEdicaoForm form, BindingResult result, RedirectAttributes attrs) {
+        if (result.hasErrors()) {
+            // renderizamos a view form reaproveitando o atributo form da view anterior
+            // este form também terá acesso ao result
+            return "admin/usuario/edicao-form";
+        }
+
+        try {
+            service.editar(form, id);
+            attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Usuário editado com sucesso!"));
+        } catch(ValidacaoException e) {
+            result.addError(e.getFieldError());
+            return "admin/usuario/edicao-form";
+        }
+
 
         return "redirect:/admin/usuarios";
     }    
