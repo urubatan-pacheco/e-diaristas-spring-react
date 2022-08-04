@@ -14,3 +14,7 @@ spring.jpa.show-sql=true
 
 # Thymeleaf - ambiente de desenvolvimento
 spring.thymeleaf.cache=false
+
+# Remember-me. Sugetão use o https://randomkeygen.com/
+br.com.urubatanpacheco.ediaristas.rememberMe.key=""
+br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds=172800
