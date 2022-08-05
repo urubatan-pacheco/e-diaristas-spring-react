@@ -1,0 +1,11 @@
+{"properties": [
+    {
+  "name": "br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds",
+  "type": "java.lang.Integer",
+  "description": "A description for 'br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds'"
+},
+{
+  "name": "br.com.urubatanpacheco.ediaristas.rememberMe.key",
+  "type": "java.lang.String",
+  "description": "A description for 'br.com.urubatanpacheco.ediaristas.rememberMe.key'"
+}]}
