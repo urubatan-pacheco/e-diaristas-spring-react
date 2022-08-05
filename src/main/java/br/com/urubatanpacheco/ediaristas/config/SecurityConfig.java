@@ -36,7 +36,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .userDetailsService(userDetailsService)
         .passwordEncoder(passwordEncoder);
 
-       super.configure(auth);
    } 
 
    @Override
@@ -66,7 +65,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
    public void configure(WebSecurity web) throws Exception {
         web.ignoring()
            .antMatchers("/webjars/**"); // aonfr pot padrão ficam os arquivos estáticos da aplicação
-       super.configure(web);
+
    }
 }
 
