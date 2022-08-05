@@ -1,5 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.web.controllers;
 
+import java.security.Principal;
+
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.com.urubatanpacheco.ediaristas.core.exceptions.ValidacaoException;
+import br.com.urubatanpacheco.ediaristas.web.dtos.AlterarSenhaForm;
 import br.com.urubatanpacheco.ediaristas.web.dtos.FlashMessage;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioCadastroForm;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioEdicaoForm;
@@ -45,7 +48,11 @@ public class UsuarioController {
     }    
 
     @PostMapping("/cadastrar")
-    public String cadastrar(@Valid @ModelAttribute("form") UsuarioCadastroForm form, BindingResult result, RedirectAttributes attrs) {
+    public String cadastrar(
+        @Valid @ModelAttribute("form") UsuarioCadastroForm form, 
+        BindingResult result, 
+        RedirectAttributes attrs
+    ) {
         if (result.hasErrors()) {
             // cadastro-form.html requires atribute "form", que can recover the previous form value
             return "admin/usuario/cadastro-form";        
@@ -76,7 +83,12 @@ public class UsuarioController {
     }
      
     @PostMapping("/{id}/editar")
-    public String editar( @PathVariable Long id, @Valid @ModelAttribute("form") UsuarioEdicaoForm form, BindingResult result, RedirectAttributes attrs) {
+    public String editar( 
+        @PathVariable Long id, 
+        @Valid @ModelAttribute("form") UsuarioEdicaoForm form, 
+        BindingResult result, 
+        RedirectAttributes attrs
+    ) {
         if (result.hasErrors()) {
             // renderizamos a view form reaproveitando o atributo form da view anterior
             // este form também terá acesso ao result
@@ -103,4 +115,45 @@ public class UsuarioController {
 
         return "redirect:/admin/usuarios";
     }
+
+
+    @GetMapping("/alterar-senha")
+    public ModelAndView alterarSenha(RedirectAttributes attrs) {
+        var modelAndView = new ModelAndView("admin/usuario/alterar-senha");
+
+        modelAndView.addObject("form", new AlterarSenhaForm() );
+        
+        return modelAndView;
+    }
+
+    @PostMapping("/alterar-senha")
+    public String alterarSenha(
+        @Valid @ModelAttribute("form") AlterarSenhaForm form, 
+        BindingResult result, 
+        RedirectAttributes attrs, 
+        Principal principal
+    ) {
+        if (result.hasErrors()) {
+            // alterar-senha.html requires atribute "form", que can recover the previous form value
+            return "admin/usuario/alterar-senha";        
+        }
+
+        // obtém o user name do usuário logado que no caso é o E-mail do usuário
+        var email = principal.getName();
+        try {
+        service.alterarSenha(form, email);
+        // FlashMessage atrtribute alert tratado no usuario/lista.html
+        attrs.addFlashAttribute("alert", new FlashMessage("alert-success","Senha alterada com sucesso!"));
+
+        } catch(ValidacaoException e) {
+            result.addError(e.getFieldError());
+            return "admin/usuario/alterar-senha";
+
+        }
+    
+
+        return "redirect:/admin/usuarios/alterar-senha";
+    }   
+
+     
 }

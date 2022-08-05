@@ -13,8 +13,10 @@ import br.com.urubatanpacheco.ediaristas.core.exceptions.SenhasNaoConferemExcept
 import br.com.urubatanpacheco.ediaristas.core.exceptions.UsuarioNaoEncontradoException;
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
+import br.com.urubatanpacheco.ediaristas.web.dtos.AlterarSenhaForm;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioCadastroForm;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioEdicaoForm;
+import br.com.urubatanpacheco.ediaristas.web.interfaces.IConfirmacaoSenha;
 import br.com.urubatanpacheco.ediaristas.web.mappers.WebUsuarioMapper;
 
 @Service
@@ -37,27 +39,24 @@ public class WebUsuarioService {
         .orElseThrow(() -> new UsuarioNaoEncontradoException(String.format("Usuário com ID %d não encontrado!", id)));
     }
 
+    public Usuario buscarPorEmail(String email) {
+        return repository.findByEmail(email)
+        .orElseThrow(() -> new UsuarioNaoEncontradoException(String.format("Usuário com email %s não encontrado!", email)));
+    }
+
     public UsuarioEdicaoForm buscarFormPorId(Long id) {
         var model = buscarPorId(id);
         return mapper.toForm(model);
     }
 
     public Usuario cadastrar(UsuarioCadastroForm form) {
-        // validar se senha e confirmaçãoSenha são iguais
-        var senha = form.getSenha();
-        var confirmacaoSenha = form.getConfirmacaoSenha();
-
-        if (senha.equals(confirmacaoSenha) == false) {
-            var mensagem = "Os dois campos de senhas não conferem!";
-            var fieldError = new FieldError(form.getClass().getName(), "confirmacaoSenha", form.getConfirmacaoSenha(), false, null, null, mensagem);
-
-            throw new SenhasNaoConferemException(mensagem, fieldError);
-        }
+  
+        validarConfirmacaoSenha(form);
 
         var usuario = mapper.toModel(form);
 
         // encriptar a senha do usuário
-        usuario.setSenha( passwordEncoder.encode(usuario.getSenha()));
+        usuario.setSenha( passwordEncoder.encode(form.getSenha()));
 
         // todo usuário cadastrado no Sistema Administrativo é do tipo ADMIN
         // todos estes usuários poderão realizar todas as tarefas do sistema administrativo
@@ -92,6 +91,29 @@ public class WebUsuarioService {
        
     }
 
+    public void alterarSenha(AlterarSenhaForm form, String email) {
+        validarConfirmacaoSenha(form);
+
+        var usuario = buscarPorEmail(email);
+        var senhaNova = form.getSenha();
+
+
+        // verificar se senha atual corresponde a senha cadastrada
+        var senhaAtualEncoded = usuario.getSenha();
+        var senhaAntiga =  form.getSenhaAntiga();
+
+        if (passwordEncoder.matches(senhaAntiga, senhaAtualEncoded)  ==  false) {
+            var mensagem = "A senha antiga está incorreta!";
+            var fieldError = new FieldError(form.getClass().getName(), "senhaAntiga", senhaAntiga, false, null, null, mensagem);
+
+            throw new SenhasNaoConferemException(mensagem,fieldError);
+        }
+
+        usuario.setSenha(passwordEncoder.encode(senhaNova));
+        repository.save(usuario);
+
+    }
+
     private void validarCamposUnicos(Usuario usuario) {
         if (repository.isEmailJaCadastrado(usuario.getEmail(), usuario.getId())) {
             var mensagem = "Já existe um usuário cadastrado com este e-mail!";
@@ -99,5 +121,17 @@ public class WebUsuarioService {
 
             throw new EmailExistenteException(mensagem, fieldError);
         }
+    }
+
+    private void validarConfirmacaoSenha(IConfirmacaoSenha obj) {
+
+        var confirmacaoSenha = obj.getConfirmacaoSenha();
+        if (obj.getSenha().equals(confirmacaoSenha) == false) {
+            var mensagem = "Os dois campos de senhas não conferem!";
+            var fieldError = new FieldError(obj.getClass().getName(), "confirmacaoSenha", confirmacaoSenha, false, null, null, mensagem);
+
+            throw new SenhasNaoConferemException(mensagem, fieldError);
+        }
+
     }
 }
