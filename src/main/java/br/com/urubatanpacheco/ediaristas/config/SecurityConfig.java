@@ -64,7 +64,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
    @Override
    public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-           .antMatchers("/webjars/**"); // aonfr pot padrão ficam os arquivos estáticos da aplicação
+           .antMatchers("/webjars/**")
+           .antMatchers("/img/**"); // aonfr pot padrão ficam os arquivos estáticos da aplicação
 
    }
 }
