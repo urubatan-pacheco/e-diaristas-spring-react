@@ -1,0 +1,79 @@
+@startuml "E-diaristas V2"
+
+
+
+Usuario --|> TipoUsuario
+Usuario "1" -- "0..1" Foto
+Usuario "0..n" }--up--{ "0..n" CidadeAtendida
+
+class Usuario {
+    - Long id
+    - String nomeCompleto
+    - String email
+    - String senha 
+    - TipoUsuario tipoUsuario 
+
+    - String cpf 
+    - LocalDate nascimento 
+    - String telefone 
+    - Double reputacao 
+    - String chavepix 
+    - Foto FotoUsuario
+    - Foto fotoDocumento
+    - List<CidadeAtendida> cidadesAtendidas
+    }
+
+class Foto {
+    - Long id 
+    - String filename 
+    - Long contentLength 
+    - String contentType 
+    - String url 
+}
+
+class CidadeAtendida {
+    - Long id
+    - String codigoibge
+    - String cidade 
+    - String estado 
+    - List<Usuario> usuarios
+}
+
+enum TipoUsuario {
+    ADMIN
+    CLIENTE 
+    DIARISTA 
+}
+
+Servico --|> Icone 
+
+class Servico {
+    - Long id 
+    - String nome 
+    - BigDecimal qtdHoras
+    - Integer qtdHoras 
+    - BigDecimal porcentagemComissao
+    - Integer qtdHorasQuarto
+    - BigDecimal valorQuarto
+    - Integer qtdHorasSala
+    - BigDecimal valorSala
+    - Integer qtdHorasBanheiro
+    - BigDecimal valorBanheiro
+    - Integer qtdHorasCozinha
+    - BigDecimal valorCozinha
+    - Integer qtdHorasQuintal
+    - BigDecimal valorQuintal
+    - Integer qtdHorasOutros
+    - BigDecimal valorOutros
+    - Icone Icone
+    - Integer posicao
+
+}
+
+enum Icone {
+    TWF_CLEANING_1
+    TWF_CLEANING_2
+    TWF_CLEANING_3
+}
+
+@enduml

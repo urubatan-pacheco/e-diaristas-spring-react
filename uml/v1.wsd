@@ -1,0 +1,34 @@
+@startuml "E-diaristas V1"
+
+Servico --|> Icone 
+
+class Servico {
+    - Long id 
+    - String nome 
+    - BigDecimal qtdHoras
+    - Integer qtdHoras 
+    - BigDecimal porcentagemComissao
+    - Integer qtdHorasQuarto
+    - BigDecimal valorQuarto
+    - Integer qtdHorasSala
+    - BigDecimal valorSala
+    - Integer qtdHorasBanheiro
+    - BigDecimal valorBanheiro
+    - Integer qtdHorasCozinha
+    - BigDecimal valorCozinha
+    - Integer qtdHorasQuintal
+    - BigDecimal valorQuintal
+    - Integer qtdHorasOutros
+    - BigDecimal valorOutros
+    - Icone Icone
+    - Integer posicao
+
+}
+
+enum Icone {
+    TWF_CLEANING_1
+    TWF_CLEANING_2
+    TWF_CLEANING_3
+}
+
+@enduml
