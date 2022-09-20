@@ -1,6 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.core.models;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -11,6 +12,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 
 import br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario;
@@ -71,5 +74,8 @@ public class Usuario {
     @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true  )       
     private Foto fotoUsuario;
 
+    @ManyToMany
+    @JoinTable
+    private List<CidadeAtendida> cidadesAtendidas;
 
 }

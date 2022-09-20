@@ -17,7 +17,7 @@ class Usuario {
     - LocalDate nascimento 
     - String telefone 
     - Double reputacao 
-    - String chavepix 
+    - String chavePix 
     - Foto FotoUsuario
     - Foto fotoDocumento
     - List<CidadeAtendida> cidadesAtendidas
@@ -33,7 +33,7 @@ class Foto {
 
 class CidadeAtendida {
     - Long id
-    - String codigoibge
+    - String codigoIbge
     - String cidade 
     - String estado 
     - List<Usuario> usuarios
