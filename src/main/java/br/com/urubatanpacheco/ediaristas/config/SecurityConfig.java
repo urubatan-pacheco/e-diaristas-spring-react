@@ -1,5 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.config;
  
+import javax.annotation.security.PermitAll;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -41,6 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
    @Override
    protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+            .antMatchers("/api/**").permitAll()
             .antMatchers("/admin/**").hasAuthority(TipoUsuario.ADMIN.toString()) // rotas admin apenas para usuários ADMIN
             .anyRequest().authenticated(); // qualquer outra rota vai ser bloqueada por padrão
 
