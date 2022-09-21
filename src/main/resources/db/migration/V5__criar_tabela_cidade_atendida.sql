@@ -7,12 +7,12 @@ CREATE TABLE `cidade_atendida` (
     UNIQUE KEY (`codigo_ibge`)
 );
 
-CREATE TABLE `cidade_atendida_usuario` (
-    `cidade_atendida_id` BIGINT NOT NULL,
-    `usuario_id` BIGINT NOT NULL,
-    KEY (`usuario_id`),
-    KEY (`cidade_atendida_id`),
-    CONSTRAINT FOREIGN KEY (`cidade_atendida_id`) REFERENCES `cidade_atendida` (`id`),
-    CONSTRAINT FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`)
+CREATE TABLE `usuario_cidade_atendida` (
+    `cidades_atendidas_id` BIGINT NOT NULL,
+    `usuarios_id` BIGINT NOT NULL,
+    KEY (`usuarios_id`),
+    KEY (`cidades_atendidas_id`),
+    CONSTRAINT FOREIGN KEY (`cidades_atendidas_id`) REFERENCES `cidade_atendida` (`id`),
+    CONSTRAINT FOREIGN KEY (`usuarios_id`) REFERENCES `usuario` (`id`)
 
 );

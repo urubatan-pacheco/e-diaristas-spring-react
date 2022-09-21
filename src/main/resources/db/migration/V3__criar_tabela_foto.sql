@@ -5,5 +5,5 @@ CREATE TABLE `foto` (
     `filename` VARCHAR(255) NOT NULL,  
     `url` VARCHAR(255) NOT NULL,  
     PRIMARY KEY (`id`),
-    UNIQUE KEY (`filename`)
+    UNIQUE KEY (`filename`) 
 );

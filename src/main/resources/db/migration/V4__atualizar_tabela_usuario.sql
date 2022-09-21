@@ -8,7 +8,7 @@ ALTER TABLE `usuario`
     ADD `foto_usuario` BIGINT DEFAULT NULL,
     ADD UNIQUE KEY (`chave_pix`),
     ADD UNIQUE KEY (`cpf`),
-    ADD FOREIGN KEY (`foto_usuario`) REFERENCES `foto` (`id`),
-    ADD FOREIGN KEY (`foto_documento`) REFERENCES `foto` (`id`);
+    ADD FOREIGN KEY (`foto_usuario_id`) REFERENCES `foto` (`id`),
+    ADD FOREIGN KEY (`foto_documento_id`) REFERENCES `foto` (`id`);
 
 
