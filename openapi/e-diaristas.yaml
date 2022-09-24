@@ -1,0 +1,83 @@
+openapi: 3.0.1
+info:
+  title: e-diaristas
+  description: API back-end da aplicação e-diaristas
+  contact:
+    name: Urubatan Pacheco
+    email: urubatan.pacheco@gmail.com
+  version: 1.0.0
+servers:
+  - url: http://192.168.234.128:8080
+    description: back-end da aplicação em ambiente de desenvolvimento
+tags:
+  - name: Diaristas
+paths:
+  /api/diaristas/localidades:
+    get:
+      operationId: buscarDiaristasPorCep
+      tags:
+        - Diaristas
+      description: busca diaristas que atendem uma determinada localidade
+      parameters:
+        - name: cep
+          in: query
+          description: número do CEP da localidade
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{8}$|^\d{5}-\d{3}$'
+          example: '13086701'
+      responses:
+        '200':
+          description: diaristas que atendem ao CEP realizada com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DiaristasLocalidadePaginadaResponse'
+        '400':
+          description: CEP inválido ou não foi informado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: CEP não encontrado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      properties:
+        status:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+        path:
+          type: string
+    DiaristasLocalidadePaginadaResponse:
+      properties:
+        diaristas:
+          type: array
+          items:
+            $ref: '#/components/schemas/DiaristaLocalidadeResponse'
+        quantidade_diaristas_restante:
+          type: integer
+    DiaristaLocalidadeResponse:
+      type: object
+      properties:
+        nome_completo:
+          type: string
+        reputacao:
+          type: number
+          format: double
+        url_foto_usuario:
+          type: string
+          format: uri
+        cidade:
+          type: string
