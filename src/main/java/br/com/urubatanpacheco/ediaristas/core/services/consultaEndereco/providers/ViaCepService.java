@@ -31,10 +31,11 @@ public class ViaCepService implements EnderecoService {
             throw new EnderecoServiceException("O CEP informado é inválido!");
         } 
 
-        if (response.getBody().getCep() == null) {
+        var responseBody = response.getBody();
+        if (responseBody != null && responseBody.getCep() == null)  {
             throw new EnderecoServiceException("O CEP informado não foi encontrado!");
         }
-        return response.getBody();
+        return responseBody;
     }
     
 }

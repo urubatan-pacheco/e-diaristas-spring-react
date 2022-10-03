@@ -12,6 +12,6 @@ public interface ApiDiaristaMapper {
     ApiDiaristaMapper INSTANCE =  Mappers.getMapper(ApiDiaristaMapper.class);
 
     @Mapping(target = "urlFotoUsuario", source = "fotoUsuario.url")
-   DiaristaLocalidadeResponse toDiaristaLocalidadeResponse(Usuario model);
+    DiaristaLocalidadeResponse toDiaristaLocalidadeResponse(Usuario model);
 
 }
