@@ -7,6 +7,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.DiaristaLocalidadePagedResponse;
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.DisponibilidadeResponse;
 import br.com.urubatanpacheco.ediaristas.api.mappers.ApiDiaristaMapper;
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
@@ -27,7 +28,7 @@ public class ApiDiaristaService {
 
     public DiaristaLocalidadePagedResponse buscarDiaristasPorCep(String cep) {
 
-        var codigoIbge =  enderecoService.buscarEnderecoPorCep(cep).getIbge();
+        var codigoIbge =  buscarCodigoIbgePorCep(cep);
 
         final var DIARISTAS_PAGE_INDEX = 0;
         final var DIARISTAS_PAGE_SIZE = 6;
@@ -44,6 +45,16 @@ public class ApiDiaristaService {
             .toList();
         
         return new DiaristaLocalidadePagedResponse(diaristas, DIARISTAS_PAGE_SIZE, diaristasPaginavel.getTotalElements());
+    }
+
+    private String buscarCodigoIbgePorCep(String cep) {
+        return enderecoService.buscarEnderecoPorCep(cep).getIbge();
+    }
+
+    public DisponibilidadeResponse verificarDiaristasPorCep(String cep) {
+        var codigoIbge =  buscarCodigoIbgePorCep(cep);
+        var disponibilidade = repository.existsByCidadesAtendidasCodigoIbge(codigoIbge);
+        return new DisponibilidadeResponse(disponibilidade);
     }
 
 }
