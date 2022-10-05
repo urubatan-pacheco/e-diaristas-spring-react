@@ -17,7 +17,7 @@ public class ServicoRestController {
     private ApiServicoService servico;
 
     @GetMapping
-    public List<ServicoResponse> buscarServicos() {
+    public List<ServicoResponse> buscarTodos() {
         return servico.buscarTodos();
     }
 }
