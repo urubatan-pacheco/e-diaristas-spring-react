@@ -63,6 +63,6 @@ public class UsuarioRequest {
     // private String fotoDocumento;
     
     @Size(min = 11, max = 255)
-    private String chave_pix;
+    private String chavePix;
 
 }

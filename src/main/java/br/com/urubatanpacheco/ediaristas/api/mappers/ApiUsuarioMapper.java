@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.UsuarioRequest;
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario;
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 
@@ -25,4 +26,6 @@ public interface ApiUsuarioMapper {
         .orElseThrow(() -> new IllegalArgumentException("Tipo de usuário inválido"));
     }
 
+    @Mapping(target = "tipoUsuario", source = "tipoUsuario.id")
+    UsuarioResponse toResponse(Usuario usuario);
 }
