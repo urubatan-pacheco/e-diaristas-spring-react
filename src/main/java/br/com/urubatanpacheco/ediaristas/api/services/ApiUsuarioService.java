@@ -21,7 +21,7 @@ public class ApiUsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private UsuarioResponse cadastrar(UsuarioRequest request) {
+    public UsuarioResponse cadastrar(UsuarioRequest request) {
         var usuarioParaCadastrar = mapper.toModel(request);
 
         usuarioParaCadastrar.setSenha(passwordEncoder.encode(usuarioParaCadastrar.getSenha()));
