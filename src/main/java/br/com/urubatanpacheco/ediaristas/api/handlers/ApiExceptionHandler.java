@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.ErrorResponse;
+import br.com.urubatanpacheco.ediaristas.core.exceptions.ValidacaoException;
 import br.com.urubatanpacheco.ediaristas.core.services.consultaEndereco.exceptions.EnderecoServiceException;
 
 @RestControllerAdvice(annotations = RestController.class)
@@ -58,4 +59,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.badRequest().body(errorResponse);
     }
+
+    @ExceptionHandler(ValidacaoException.class)
+    public  ResponseEntity<Object> handleValidacaoException(ValidacaoException exception) {
+        var body = new HashMap<String, List<String>>();
+        var fieldError = exception.getFieldError();
+        var fieldErrors = new ArrayList<String>();
+
+        fieldErrors.add(fieldError.getDefaultMessage());
+        var field = camelCaseToSnakeCase.translate(fieldError.getField());
+
+        body.put(field, fieldErrors );
+
+
+        return ResponseEntity.badRequest().body(body);
+    }
 }
+

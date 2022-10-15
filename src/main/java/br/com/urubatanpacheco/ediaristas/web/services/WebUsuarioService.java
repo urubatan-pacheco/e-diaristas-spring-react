@@ -8,11 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.FieldError;
 
 import br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario;
-import br.com.urubatanpacheco.ediaristas.core.exceptions.EmailExistenteException;
 import br.com.urubatanpacheco.ediaristas.core.exceptions.SenhasNaoConferemException;
+
 import br.com.urubatanpacheco.ediaristas.core.exceptions.UsuarioNaoEncontradoException;
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
+import br.com.urubatanpacheco.ediaristas.core.validators.UsuarioValidator;
 import br.com.urubatanpacheco.ediaristas.web.dtos.AlterarSenhaForm;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioCadastroForm;
 import br.com.urubatanpacheco.ediaristas.web.dtos.UsuarioEdicaoForm;
@@ -29,6 +30,9 @@ public class WebUsuarioService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UsuarioValidator validator;
 
     public List<Usuario> buscarTodos() {
         return repository.findAll();
@@ -50,7 +54,6 @@ public class WebUsuarioService {
     }
 
     public Usuario cadastrar(UsuarioCadastroForm form) {
-  
         validarConfirmacaoSenha(form);
 
         var usuario = mapper.toModel(form);
@@ -63,7 +66,7 @@ public class WebUsuarioService {
         usuario.setTipoUsuario(TipoUsuario.ADMIN);
 
         // validar emails não duplicados
-        validarCamposUnicos(usuario);        
+        validator.validar(usuario);        
         
         return repository.save(usuario);
 
@@ -80,7 +83,7 @@ public class WebUsuarioService {
         model.setTipoUsuario(usuario.getTipoUsuario());
 
         // validar emails não duplicados
-        validarCamposUnicos(model);
+        validator.validar(model);
 
         return repository.save(model);
     }
@@ -88,7 +91,6 @@ public class WebUsuarioService {
     public void excluir(Long id) {
         var usuario = buscarPorId(id);
         repository.delete(usuario);
-       
     }
 
     public void alterarSenha(AlterarSenhaForm form, String email) {
@@ -114,14 +116,6 @@ public class WebUsuarioService {
 
     }
 
-    private void validarCamposUnicos(Usuario usuario) {
-        if (repository.isEmailJaCadastrado(usuario.getEmail(), usuario.getId())) {
-            var mensagem = "Já existe um usuário cadastrado com este e-mail!";
-            var fieldError = new FieldError(usuario.getClass().getName(), "email", usuario.getEmail(), false, null, null, mensagem);
-
-            throw new EmailExistenteException(mensagem, fieldError);
-        }
-    }
 
     private void validarConfirmacaoSenha(IConfirmacaoSenha obj) {
 
