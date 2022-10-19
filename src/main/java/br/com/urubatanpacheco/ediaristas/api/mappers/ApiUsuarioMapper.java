@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 public interface ApiUsuarioMapper {
     ApiUsuarioMapper  INSTANCE =  Mappers.getMapper(ApiUsuarioMapper.class);
 
-    //@Mapping(target = "urlFotoUsuario", source = "fotoUsuario.url")
+    @Mapping(target = "fotoDocumento", ignore = true)
     @Mapping(target = "senha", source = "password")
     Usuario toModel(UsuarioRequest request);
 

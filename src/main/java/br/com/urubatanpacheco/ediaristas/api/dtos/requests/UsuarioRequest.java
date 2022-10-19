@@ -12,9 +12,7 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
-
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.com.urubatanpacheco.ediaristas.core.validators.Idade;
 import lombok.AllArgsConstructor;
@@ -24,7 +22,6 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonNaming(SnakeCaseStrategy.class)
 public class UsuarioRequest {
 
     @NotNull
@@ -62,10 +59,30 @@ public class UsuarioRequest {
     @NotNull
     @Size(min = 11, max = 11)
     private String telefone;
-    
-    // private String fotoDocumento;
+
+    @NotNull
+    private MultipartFile fotoDocumento;
     
     @Size(min = 11, max = 255)
     private String chavePix;
 
-}
+    public void setNome_completo(String nomeCompleto) {
+        setNomeCompleto(nomeCompleto);
+    }
+
+    public void setPassword_confirmation(String passwordConfirmation) {
+        setPasswordConfirmation(passwordConfirmation);
+    }
+
+    public void setTipo_usuario(Integer tipoUsuario) {
+        setTipoUsuario(tipoUsuario);
+    }
+
+    public void setFoto_documento(MultipartFile fotoDocumento)     {
+        setFotoDocumento(fotoDocumento);
+    }
+
+    public void setChave_pix(String chavePix) {
+        setChavePix(chavePix);
+    }
+  }

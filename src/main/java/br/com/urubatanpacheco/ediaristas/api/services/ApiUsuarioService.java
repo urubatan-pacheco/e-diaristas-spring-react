@@ -10,6 +10,7 @@ import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.api.mappers.ApiUsuarioMapper;
 import br.com.urubatanpacheco.ediaristas.core.exceptions.SenhasNaoConferemException;
 import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
+import br.com.urubatanpacheco.ediaristas.core.services.storage.adapters.StorageService;
 import br.com.urubatanpacheco.ediaristas.core.validators.UsuarioValidator;
 
 @Service
@@ -17,6 +18,9 @@ public class ApiUsuarioService {
 
     @Autowired
     UsuarioRepository repository;
+
+    @Autowired
+    StorageService storageService;
 
     @Autowired
     ApiUsuarioMapper mapper;
@@ -35,6 +39,9 @@ public class ApiUsuarioService {
         validator.validar(usuarioParaCadastrar);
 
         usuarioParaCadastrar.setSenha(passwordEncoder.encode(usuarioParaCadastrar.getSenha()));
+
+        usuarioParaCadastrar.setFotoDocumento(storageService.salvar(request.getFotoDocumento()));
+        
         return mapper.toResponse(repository.save(usuarioParaCadastrar));
     }
 
