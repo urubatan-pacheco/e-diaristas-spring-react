@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 
@@ -18,6 +19,18 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Page<Usuario> findByCidadesAtendidasCodigoIbge(String codigoIbge, Pageable pageable);
 
     Boolean existsByCidadesAtendidasCodigoIbge(String codigoIbge);
+
+    @Query(
+        """
+            SELECT 
+                AVG(u.reputacao)
+            FROM     
+                Usuario u
+            WHERE
+                u.tipoUsuario = br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario.DIARISTA
+        """
+    )
+    Double getMediaRuputacaoDiarista();
 
 
     default Boolean isCpfJaCadastrado(Usuario usuario){
