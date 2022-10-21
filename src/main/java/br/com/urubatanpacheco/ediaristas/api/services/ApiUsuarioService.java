@@ -1,5 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.api.services;
 
+import java.util.HashMap;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,8 @@ import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.api.mappers.ApiUsuarioMapper;
 import br.com.urubatanpacheco.ediaristas.core.exceptions.SenhasNaoConferemException;
 import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
+import br.com.urubatanpacheco.ediaristas.core.services.email.adapters.EmailService;
+import br.com.urubatanpacheco.ediaristas.core.services.email.dtos.EmailParams;
 import br.com.urubatanpacheco.ediaristas.core.services.storage.adapters.StorageService;
 import br.com.urubatanpacheco.ediaristas.core.validators.UsuarioValidator;
 
@@ -31,6 +35,9 @@ public class ApiUsuarioService {
     @Autowired
     private UsuarioValidator validator;
 
+    @Autowired
+    private EmailService emailService;
+
     public UsuarioResponse cadastrar(UsuarioRequest request) {
         validarConfirmacaoSenha(request);
 
@@ -46,7 +53,24 @@ public class ApiUsuarioService {
             usuarioParaCadastrar.setReputacao(calcularReputacaoDiaristas());
         }
         
-        return mapper.toResponse(repository.save(usuarioParaCadastrar));
+        var usuarioResponse = mapper.toResponse(repository.save(usuarioParaCadastrar));
+
+        if (usuarioParaCadastrar.isCliente() || usuarioParaCadastrar.isDiarista()) {
+            var emailParams = new EmailParams();
+            var props = new HashMap<String, Object>();
+
+            props.put("nome", usuarioParaCadastrar.getNomeCompleto());
+            props.put("tipoUsuario",usuarioParaCadastrar.getTipoUsuario().name());
+
+            emailParams.setDestinatario(usuarioParaCadastrar.getEmail());
+            emailParams.setAssunto("Cadastro realizado com sucesso");
+            emailParams.setTemplate("emails/boas-vindas");
+            emailParams.setProps(props);
+
+            emailService.enviarEmailComTemplate(emailParams);
+        }
+
+        return usuarioResponse;
     }
 
     private Double calcularReputacaoDiaristas() {

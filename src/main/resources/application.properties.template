@@ -18,3 +18,11 @@ spring.thymeleaf.cache=false
 # Remember-me. Sugetão use o https://randomkeygen.com/
 br.com.urubatanpacheco.ediaristas.rememberMe.key=""
 br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds=172800
+
+# Email
+spring.mail.host=smtp.mailgun.org
+spring.mail.port=587
+spring.mail.username=<usuario>
+spring.mail.password=<senha>
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
