@@ -2,7 +2,9 @@ package br.com.urubatanpacheco.ediaristas.config;
  
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -38,11 +40,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
    } 
 
-   @Override
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        
+        return super.authenticationManagerBean();
+    }
+
+
+
+    @Override
    protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
             .antMatchers("/uploads/**").permitAll()
             .antMatchers("/api/**").permitAll()
+            .antMatchers("/auth/**").permitAll()
             .antMatchers("/admin/**").hasAuthority(TipoUsuario.ADMIN.toString()) // rotas admin apenas para usuários ADMIN
             .anyRequest().authenticated(); // qualquer outra rota vai ser bloqueada por padrão
 
@@ -63,7 +75,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .key(rememberMeKey);
 
         http.cors();
-        http.csrf().ignoringAntMatchers("/api/**");
+        http.csrf()
+        .ignoringAntMatchers("/auth/**")
+        .ignoringAntMatchers("/api/**");
    }
 
    @Override
