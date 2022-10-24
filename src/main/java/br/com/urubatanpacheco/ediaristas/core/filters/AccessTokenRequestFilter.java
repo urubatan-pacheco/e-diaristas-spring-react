@@ -40,17 +40,23 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
         ) throws ServletException, IOException {
             var token = "";
             var email = "";
-
+            System.out.println("AccessTokenRequest.doFilter request:"+request);
             var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER_FIELD_NAME);
 
-            if (isTokenPresente(AUTHORIZATION_HEADER_FIELD_NAME)) {
+            System.out.println("AccessTokenRequest.doFilter (authorization):("+authorizationHeader+")");
+            if (isTokenPresente(authorizationHeader)) {
                 token = authorizationHeader.substring(TOKEN_TYPE.length());
+                System.out.println("AccessTokenRequest.doFilter token:"+token);
+
                 email = tokenService.getSubjectDoAccessToken(token);
+                System.out.println("AccessTokenRequest.doFilter email:"+email);
 
             }
 
             if (isEmailNotInContext(email)) {
                 addEmailInContext(request, email);
+               System.out.println("AccessTokenRequest.doFilter added to context"+email);
+
             }
 
             filterChain.doFilter(request, response);
@@ -59,6 +65,8 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
 
 
     private Boolean isTokenPresente(String authorizationHeader) {
+       System.out.println("AccessTokenRequest.doFilter (TOKEN_TYPE):("+TOKEN_TYPE+")");
+       System.out.println("AccessTokenRequest.doFilter added to (authorizationHeader != null) "+(authorizationHeader != null)+ " authorizationHeader.startsWith(TOKEN_TYPE) " +(authorizationHeader != null && authorizationHeader.startsWith(TOKEN_TYPE)));
         return authorizationHeader != null && authorizationHeader.startsWith(TOKEN_TYPE);
     }
 
