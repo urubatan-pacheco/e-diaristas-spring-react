@@ -7,6 +7,9 @@ import java.util.HashMap;
 import org.springframework.stereotype.Service;
 
 import br.com.urubatanpacheco.ediaristas.core.services.token.adapters.TokenService;
+import br.com.urubatanpacheco.ediaristas.core.services.token.exceptions.TokenServiceException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -33,12 +36,24 @@ public class JjwtService implements TokenService {
 
     @Override
     public String getSubjectDoAccessToken(String accessToken) {
-        var claims =  Jwts.parser()
-            .setSigningKey(SECRET_KEY)
-            .parseClaimsJws(accessToken)
-            .getBody();
+        var claims =  getClaims(accessToken, SECRET_KEY);
 
         return claims.getSubject();
+    }
+
+    private Claims getClaims(String accessToken, String signKey) {
+        try {
+            return tryGetClaims(accessToken, signKey);
+        } catch( JwtException exception ) {
+            throw new TokenServiceException(exception.getLocalizedMessage());
+        }
+    }
+
+    private Claims tryGetClaims(String accessToken, String signKey) {
+        return Jwts.parser()
+            .setSigningKey(signKey)
+            .parseClaimsJws(accessToken)
+            .getBody();
     }
     
 }

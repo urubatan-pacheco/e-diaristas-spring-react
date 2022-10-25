@@ -1,6 +1,8 @@
 package br.com.urubatanpacheco.ediaristas.core.filters;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -8,6 +10,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +20,11 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.ErrorResponse;
 import br.com.urubatanpacheco.ediaristas.core.services.token.adapters.TokenService;
+import br.com.urubatanpacheco.ediaristas.core.services.token.exceptions.TokenServiceException;
 
 @Component
 public class AccessTokenRequestFilter extends OncePerRequestFilter {
@@ -32,35 +41,61 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Override
     protected void doFilterInternal(
         HttpServletRequest request, 
         HttpServletResponse response, 
         FilterChain filterChain
         ) throws ServletException, IOException {
-            var token = "";
-            var email = "";
-            System.out.println("AccessTokenRequest.doFilter request:"+request);
-            var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER_FIELD_NAME);
+            try {
+                tryDoFilterInternal(request, response, filterChain);
+            } catch (TokenServiceException exception) {
+                var status = HttpStatus.UNAUTHORIZED; // 401
+                var errorResponse =  ErrorResponse
+                    .builder()
+                    .status(status.value())
+                    .timestamp(LocalDateTime.now())
+                    .message(exception.getLocalizedMessage())
+                    .path(request.getRequestURI())
+                    .build();
+                var json = objectMapper.writeValueAsString(errorResponse);
 
-            System.out.println("AccessTokenRequest.doFilter (authorization):("+authorizationHeader+")");
-            if (isTokenPresente(authorizationHeader)) {
-                token = authorizationHeader.substring(TOKEN_TYPE.length());
-                System.out.println("AccessTokenRequest.doFilter token:"+token);
-
-                email = tokenService.getSubjectDoAccessToken(token);
-                System.out.println("AccessTokenRequest.doFilter email:"+email);
-
+                response.setStatus(status.value());
+                response.setHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE); 
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                response.getWriter().write(json);                   
             }
-
-            if (isEmailNotInContext(email)) {
-                addEmailInContext(request, email);
-               System.out.println("AccessTokenRequest.doFilter added to context"+email);
-
-            }
-
-            filterChain.doFilter(request, response);
         
+    }
+
+
+    private void tryDoFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws IOException, ServletException {
+        var token = "";
+        var email = "";
+        System.out.println("AccessTokenRequest.doFilter request:"+request);
+        var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER_FIELD_NAME);
+
+        System.out.println("AccessTokenRequest.doFilter (authorization):("+authorizationHeader+")");
+        if (isTokenPresente(authorizationHeader)) {
+            token = authorizationHeader.substring(TOKEN_TYPE.length());
+            System.out.println("AccessTokenRequest.doFilter token:"+token);
+
+            email = tokenService.getSubjectDoAccessToken(token);
+            System.out.println("AccessTokenRequest.doFilter email:"+email);
+
+        }
+
+        if (isEmailNotInContext(email)) {
+            addEmailInContext(request, email);
+           System.out.println("AccessTokenRequest.doFilter added to context"+email);
+
+        }
+
+        filterChain.doFilter(request, response);
     }
 
 
