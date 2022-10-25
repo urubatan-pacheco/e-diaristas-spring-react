@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.api.services.ApiMeService;
+import br.com.urubatanpacheco.ediaristas.core.permissions.EDiaristasPermissions;
 
 @RestController
 @RequestMapping("/api/me")
@@ -16,7 +17,7 @@ public class MeRestController {
     @Autowired
     private ApiMeService service;
 
-    @PreAuthorize("hasAnyAuthority('DIARISTA','CLIENTE')")
+    @EDiaristasPermissions.isDiaristaOrCliente
     @GetMapping
     public UsuarioResponse me() {
         return service.obterUsuarioLogado();
