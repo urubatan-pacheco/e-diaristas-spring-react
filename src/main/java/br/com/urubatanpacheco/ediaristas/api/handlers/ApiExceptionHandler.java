@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.ErrorResponse;
 import br.com.urubatanpacheco.ediaristas.core.exceptions.ValidacaoException;
 import br.com.urubatanpacheco.ediaristas.core.services.consultaEndereco.exceptions.EnderecoServiceException;
+import br.com.urubatanpacheco.ediaristas.core.services.token.exceptions.TokenServiceException;
 
 @RestControllerAdvice(annotations = RestController.class)
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -74,5 +75,18 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.badRequest().body(body);
     }
+
+    @ExceptionHandler(TokenServiceException.class)
+    public  ResponseEntity<Object> handleEnderecoServiceException(TokenServiceException exception, HttpServletRequest request) {
+        var errorResponse = ErrorResponse.builder()
+            .status(HttpStatus.UNAUTHORIZED.value())
+            .timestamp(LocalDateTime.now())
+            .message(exception.getLocalizedMessage())
+            .path(request.getRequestURI())
+            .build();
+
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
 }
 

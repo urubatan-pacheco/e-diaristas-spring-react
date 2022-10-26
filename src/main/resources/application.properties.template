@@ -19,6 +19,13 @@ spring.thymeleaf.cache=false
 br.com.urubatanpacheco.ediaristas.rememberMe.key=""
 br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds=172800
 
+
+# Tokens
+br.com.urubatanpacheco.ediaristas.access.key=chave_access_token
+br.com.urubatanpacheco.ediaristas.access.expiration=30
+br.com.urubatanpacheco.ediaristas.refresh.key=chave_refresh_token
+br.com.urubatanpacheco.ediaristas.refresh.expiration=60
+
 # Email
 spring.mail.host=smtp.mailgun.org
 spring.mail.port=587

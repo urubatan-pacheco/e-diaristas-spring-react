@@ -10,5 +10,7 @@ import lombok.NoArgsConstructor;
 public class TokenResponse {
 
     private String access;
+
+    private String refresh;
     
 }
