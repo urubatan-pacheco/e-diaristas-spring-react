@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.RefreshRequest;
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.TokenRequest;
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.TokenResponse;
+import br.com.urubatanpacheco.ediaristas.core.services.TokenBlackListService;
 import br.com.urubatanpacheco.ediaristas.core.services.token.adapters.TokenService;
 
 @Service
@@ -25,6 +26,8 @@ public class ApiAuthService {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    private TokenBlackListService tokenBlackListService;
 
     public TokenResponse autenticar(TokenRequest tokenRequest) {
         var email = tokenRequest.getEmail();
@@ -41,14 +44,17 @@ public class ApiAuthService {
 
 
     public TokenResponse reautenticar(@Valid RefreshRequest refreshRequest) {
+        var refreshRequestToken = refreshRequest.getRefresh();
+        tokenBlackListService.verificarToken(refreshRequestToken);
 
-        var email = tokenService.getSubjectDoRfreshToken(refreshRequest.getRefresh()); // valida o token e obtem o email
+        var email = tokenService.getSubjectDoRfreshToken(refreshRequestToken); // valida o token e obtem o email
 
         userDetailsService.loadUserByUsername(email);  // somente para garantir que é um email de um usuário válido
 
         var access = tokenService.gerarAccessToken(email);
         var refresh = tokenService.gerarRefreshToken(email);
 
+        tokenBlackListService.colocarTokenNaBlackList(refreshRequestToken);
         return new TokenResponse(access, refresh);
     }
 
