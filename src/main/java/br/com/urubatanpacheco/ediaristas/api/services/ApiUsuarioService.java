@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.FieldError;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.UsuarioRequest;
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioCadastroResponse;
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.api.mappers.ApiUsuarioMapper;
 import br.com.urubatanpacheco.ediaristas.core.exceptions.SenhasNaoConferemException;
 import br.com.urubatanpacheco.ediaristas.core.publishers.NovoUsuarioPublisher;
 import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
 import br.com.urubatanpacheco.ediaristas.core.services.storage.adapters.StorageService;
+import br.com.urubatanpacheco.ediaristas.core.services.token.adapters.TokenService;
 import br.com.urubatanpacheco.ediaristas.core.validators.UsuarioValidator;
 
 @Service
@@ -35,6 +37,9 @@ public class ApiUsuarioService {
     @Autowired
     private NovoUsuarioPublisher novoUsuarioPublisher;
 
+    @Autowired
+    private TokenService tokenService;
+
     public UsuarioResponse cadastrar(UsuarioRequest request) {
         validarConfirmacaoSenha(request);
 
@@ -50,11 +55,20 @@ public class ApiUsuarioService {
             usuarioParaCadastrar.setReputacao(calcularReputacaoDiaristas());
         }
         
-        var usuarioResponse = mapper.toResponse(repository.save(usuarioParaCadastrar));
+        var usuarioResponse = mapper.toCadastroResponse(repository.save(usuarioParaCadastrar));
 
         novoUsuarioPublisher.publish(usuarioParaCadastrar);
 
+        gerarTokenResponse(usuarioResponse);
+        
         return usuarioResponse;
+    }
+
+    private void gerarTokenResponse(UsuarioCadastroResponse usuarioResponse) {
+        var email = usuarioResponse.getEmail();
+
+        usuarioResponse.setAccess(tokenService.gerarAccessToken(email));
+        usuarioResponse.setRefresh(tokenService.gerarRefreshToken(email));
     }
 
     private Double calcularReputacaoDiaristas() {

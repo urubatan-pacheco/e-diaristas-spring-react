@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.UsuarioRequest;
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioCadastroResponse;
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario;
 import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
@@ -28,4 +29,9 @@ public interface ApiUsuarioMapper {
 
     @Mapping(target = "tipoUsuario", source = "tipoUsuario.id")
     UsuarioResponse toResponse(Usuario usuario);
+
+    @Mapping(target = "tipoUsuario", source = "tipoUsuario.id")
+    @Mapping(target = "access", ignore = true)
+    @Mapping(target = "refresh", ignore = true)
+    UsuarioCadastroResponse toCadastroResponse(Usuario usuario);
 }
