@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,6 +35,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             HttpHeaders headers, 
             HttpStatus status, 
             WebRequest request) {
+                return handleBindException(ex, headers, status, request);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleBindException(
+        BindException ex, 
+        HttpHeaders headers, 
+        HttpStatus status,
+        WebRequest request) {
                 var body = new HashMap<String, List<String>>();
 
                 ex.getBindingResult().getFieldErrors().forEach(fieldError -> {
@@ -50,17 +60,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.badRequest().body(body);
     }
 
-    @ExceptionHandler(EnderecoServiceException.class)
-    public  ResponseEntity<Object> handleEnderecoServiceException(EnderecoServiceException exception, HttpServletRequest request) {
-        var errorResponse = ErrorResponse.builder()
-            .status(HttpStatus.BAD_REQUEST.value())
-            .timestamp(LocalDateTime.now())
-            .message(exception.getLocalizedMessage())
-            .path(request.getRequestURI())
-            .build();
 
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
+
 
     @ExceptionHandler(ValidacaoException.class)
     public  ResponseEntity<Object> handleValidacaoException(ValidacaoException exception) {
@@ -77,28 +78,33 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(body);
     }
 
+
+    @ExceptionHandler(EnderecoServiceException.class)
+    public  ResponseEntity<Object> handleEnderecoServiceException(EnderecoServiceException exception, HttpServletRequest request) {
+        return criarErroResponse(HttpStatus.BAD_REQUEST, exception.getLocalizedMessage(), request.getRequestURI());
+    }
+
     @ExceptionHandler(TokenServiceException.class)
     public  ResponseEntity<Object> handleEnderecoServiceException(TokenServiceException exception, HttpServletRequest request) {
-        var errorResponse = ErrorResponse.builder()
-            .status(HttpStatus.UNAUTHORIZED.value())
-            .timestamp(LocalDateTime.now())
-            .message(exception.getLocalizedMessage())
-            .path(request.getRequestURI())
-            .build();
-
-        return ResponseEntity.badRequest().body(errorResponse);
+        return criarErroResponse(HttpStatus.UNAUTHORIZED, exception.getLocalizedMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(TokenNaBlackListException.class)
     public  ResponseEntity<Object> handleTokenNaBlackListException(TokenNaBlackListException exception, HttpServletRequest request) {
+        return criarErroResponse(HttpStatus.UNAUTHORIZED, exception.getLocalizedMessage(), request.getRequestURI());
+    }
+
+    private ResponseEntity<Object> criarErroResponse(HttpStatus status, String message, String path) {
         var errorResponse = ErrorResponse.builder()
-            .status(HttpStatus.UNAUTHORIZED.value())
+            .status(status.value())
             .timestamp(LocalDateTime.now())
-            .message(exception.getLocalizedMessage())
-            .path(request.getRequestURI())
+            .message(message)
+            .path(path)
             .build();
 
         return ResponseEntity.badRequest().body(errorResponse);
-    }    
+    }  
+    
+    
 }
 
