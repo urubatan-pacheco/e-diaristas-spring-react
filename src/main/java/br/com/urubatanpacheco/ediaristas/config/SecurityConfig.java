@@ -1,21 +1,20 @@
 package br.com.urubatanpacheco.ediaristas.config;
- 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -24,38 +23,29 @@ import br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario;
 import br.com.urubatanpacheco.ediaristas.core.filters.AccessTokenRequestFilter;
 
 
+@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
+    @Value("${br.com.urubatanpacheco.ediaristas.rememberMe.key}")
+    private String rememberMeKey;
 
-   @Autowired
-   private UserDetailsService userDetailsService; 
+    @Value("${br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds}")
+    private int rememberMeValiditySeconds;
 
-   @Autowired
-   private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AccessTokenRequestFilter accessTokenRequestFilter;    
 
-   @Order(1)
-   @Configuration
-   public class ApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
-        @Autowired
-        private AccessTokenRequestFilter accessTokenRequestFilter;
+    @Autowired
+    private AuthenticationEntryPoint authenticationEntryPoint;
 
-        @Autowired
-        private AuthenticationEntryPoint authenticationEntryPoint;
+    @Autowired
+    private AccessDeniedHandler accessDeniedHandler;    
 
-        @Autowired
-        private AccessDeniedHandler accessDeniedHandler;
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
-       }   
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    @Order(1)
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
             http
             .requestMatchers(requestMatcherCustomizer -> 
                 requestMatcherCustomizer
@@ -80,37 +70,14 @@ public class SecurityConfig {
                     .authenticationEntryPoint(authenticationEntryPoint)
                     .accessDeniedHandler(accessDeniedHandler)
             )
-            .cors();        
-        } 
-        
-        @Bean
-        @Override
-        public AuthenticationManager authenticationManagerBean() throws Exception {
-            
-            return super.authenticationManagerBean();
-        }        
+            .cors(); 
+                    
+            return http.build();
     }
 
+    @Bean
     @Order(2)
-    @Configuration
-    public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-        @Value("${br.com.urubatanpacheco.ediaristas.rememberMe.key}")
-        private String rememberMeKey;
-
-        @Value("${br.com.urubatanpacheco.ediaristas.rememberMe.validitySeconds}")
-        private int rememberMeValiditySeconds;
-
-        @Override
-        protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-            auth
-                .userDetailsService(userDetailsService)
-                .passwordEncoder(passwordEncoder);
-       }         
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-
+    public SecurityFilterChain webSecurityFilterChain(HttpSecurity http) throws Exception {
             http
             .requestMatchers(requestMatcherCustomizer -> 
                 requestMatcherCustomizer
@@ -144,16 +111,21 @@ public class SecurityConfig {
                 exceptionHandlingCustomizer
                     .accessDeniedPage("/admin/login")
             );
-        }
 
+            return http.build();
+    } 
 
-        @Override
-        public void configure(WebSecurity web) throws Exception {
-            web
-            .ignoring()
-            .antMatchers("/webjars/**")
-            .antMatchers("/img/**"); // aonfr pot padrão ficam os arquivos estáticos da aplicação
-        }
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+            return 
+                web -> web
+                        .ignoring()
+                        .antMatchers("/webjars/**")
+                        .antMatchers("/img/**"); // aonfr pot padrão ficam os arquivos estáticos da aplicação
     }
-}
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }     
+}
