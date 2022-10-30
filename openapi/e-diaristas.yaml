@@ -10,8 +10,24 @@ servers:
   - url: http://192.168.234.128:8080
     description: back-end da aplicação em ambiente de desenvolvimento
 tags:
+  - name: Api
+  - name: Usuários
   - name: Diaristas
+  - name: Enderecos
 paths:
+  /api:
+    get:
+      operationId: getLinks
+      tags:
+        - Api
+      description: exibe os links iniciais da API
+      responses:
+        '200':
+          description: exibição realizada com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Links'
   /api/diaristas/localidades:
     get:
       operationId: buscarDiaristasPorCep
@@ -46,7 +62,98 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
+  /api/diaristas/disponibilidade:
+    get:
+      operationId: getDisponibilidade
+      tags:
+        - Diaristas
+      description: verificiar a disponibilidade de diaristas que atendem uma determinada localidade
+      parameters:
+        - name: cep
+          in: query
+          description: número do CEP da localidade
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{8}$|^\d{5}-\d{3}$'
+          example: '13086701'
+      responses:
+        '200':
+          description: verificação realizada com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DisponibilidadeResponse'
+        '400':
+          description: CEP inválido ou não foi informado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: CEP não encontrado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/enderecos:
+    get:
+      operationId: buscarEnderecoPorCep
+      tags:
+        - Enderecos
+      description: busca endereço referente a um CEP
+      parameters:
+        - name: cep
+          in: query
+          description: número do CEP do endereço
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{8}$|^\d{5}-\d{3}$'
+          example: '13086701'
+      responses:
+        '200':
+          description: endereço correspondente ao CEP obtido com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/EnderecoResponse'
+        '400':
+          description: CEP inválido ou não foi informado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: CEP não encontrado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /api/usuarios:
+    post:
+      operationId: postUsuario
+      tags:
+        - Usuários
+      description: Cadastrar um novo usuário
+      requestBody:
+        content:
+          'multipart/form-data':
+            schema:
+              $ref: '#/components/schemas/CreateUsuarioRequest'
+      responses:
+        '201':
+          description: usuário cadastrado com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/CreatedUsuarioResponse'
+        '400':
+          description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     ErrorResponse:
@@ -60,6 +167,12 @@ components:
           type: string
         path:
           type: string
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
     DiaristasLocalidadePaginadaResponse:
       properties:
         diaristas:
@@ -80,4 +193,132 @@ components:
           type: string
           format: uri
         cidade:
+          type: string
+    EnderecoResponse:
+      type: object
+      properties:
+        cep:
+          type: string
+        logradouro:
+          type: string
+        complemento:
+          type: string
+        bairro:
+          type: string
+        localidade:
+          type: string
+        uf:
+          type: string
+        ibge:
+          type: string
+    DisponibilidadeResponse:
+      type: object
+      properties:
+        disponibilidade:
+          type: boolean
+    Links:
+      properties:
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkResponse'
+    LinkResponse:
+      properties:
+        type:
+          type: string
+          enum:
+            - GET
+            - POST
+            - PUT
+            - PATCH
+            - DELETE
+        rel:
+          type: string
+        uri:
+          type: string
+          format: uri
+    CreateUsuarioRequest:
+      type: object
+      required:
+        - nome_completo
+        - email
+        - password
+        - password_confirmation
+        - tipo_usuario
+        - nascimento
+        - telefone
+        - foto_documento
+      properties:
+        nome_completo:
+          type: string
+          minLength: 3
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          format: password
+        password_confirmation:
+          type: string
+          format: password
+        tipo_usuario:
+          type: integer
+          enum:
+            - 1
+            - 2
+        cpf:
+          type: string
+          minLength: 11
+          maxLength: 11
+        nascimento:
+          type: string
+          format: date
+        telefone:
+          type: string
+          minLength: 11
+          maxLength: 11
+        foto_documento:
+          type: string
+          format: binary
+        chave_pix:
+          type: string
+          minLength: 11
+          maxLength: 255
+    CreatedUsuarioResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome_completo:
+          type: string
+        email:
+          type: string
+        tipo_usuario:
+          type: integer
+          enum:
+            - 1
+            - 2
+        cpf:
+          type: string
+        nascimento:
+          type: string
+          format: date
+        telefone:
+          type: string
+        foto_documento:
+          type: string
+          format: uri
+        chave_pix:
+          type: string
+        token:
+          type: object
+          #ref: '#/components/schemas/TokenResponse'
+    TokenResponse:
+      type: object
+      properties:
+        access:
+          type: string
+        refresh:
           type: string
