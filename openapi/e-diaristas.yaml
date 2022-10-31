@@ -11,6 +11,7 @@ servers:
     description: back-end da aplicação em ambiente de desenvolvimento
 tags:
   - name: Api
+  - name: Auth
   - name: Usuários
   - name: Diaristas
   - name: Enderecos
@@ -150,6 +151,36 @@ paths:
                 $ref: '#/components/schemas/CreatedUsuarioResponse'
         '400':
           description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/token:
+    post:
+      operationId: login
+      tags:
+        - Auth
+      description: autenticar com as credenciais do usuário
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CredentialsRequest'
+      responses:
+        '200':
+          description: usuário logado com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: credenciais incorretas
           content:
             'application/json':
               schema:
@@ -322,3 +353,16 @@ components:
           type: string
         refresh:
           type: string
+    CredentialsRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          format: password
