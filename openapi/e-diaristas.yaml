@@ -185,6 +185,36 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /auth/refresh:
+    post:
+      operationId: refresh
+      tags:
+        - Auth
+      description: reautenticar usando o refresh token
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '200':
+          description: usuário logado com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: refresh token inválido
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     ErrorResponse:
@@ -351,6 +381,13 @@ components:
       properties:
         access:
           type: string
+        refresh:
+          type: string
+    RefreshRequest:
+      required:
+        - refresh
+      type: object
+      properties:
         refresh:
           type: string
     CredentialsRequest:
