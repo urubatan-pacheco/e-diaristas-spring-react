@@ -10,6 +10,7 @@ servers:
   - url: http://192.168.234.128:8080
     description: back-end da aplicação em ambiente de desenvolvimento
 tags:
+  - name: Me
   - name: Api
   - name: Auth
   - name: Usuários
@@ -245,7 +246,38 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /api/me:
+    get:
+      operationId: getMe
+      tags:
+        - Me
+      description: obter dados do usuário logado
+      security:
+        - JWT: []
+      responses:
+        '200':
+          description: usuário logado obtido com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MeResponse'
+        '400':
+          description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: usuário não está autenticado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
   schemas:
     ErrorResponse:
       properties:
@@ -406,6 +438,10 @@ components:
         token:
           type: object
           #ref: '#/components/schemas/TokenResponse'
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkResponse'
     TokenResponse:
       type: object
       properties:
@@ -433,3 +469,30 @@ components:
         password:
           type: string
           format: password
+    MeResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+        nome_completo:
+          type: string
+        email:
+          type: string
+        tipo_usuario:
+          type: integer
+          enum:
+            - 1
+            - 2
+        cpf:
+          type: string
+        nascimento:
+          type: string
+          format: date
+        telefone:
+          type: string
+        chave_pix:
+          type: string
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/LinkResponse'
