@@ -215,6 +215,36 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /auth/logout:
+    post:
+      operationId: logout
+      tags:
+        - Auth
+      description: realizar o logout ao invalidar o refresh token
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/RefreshRequest'
+      responses:
+        '205':
+          description: logout realizado com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: refresh token inválido
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     ErrorResponse:
