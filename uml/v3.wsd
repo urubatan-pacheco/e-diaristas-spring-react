@@ -1,0 +1,128 @@
+@startuml "E-diaristas V2"
+left to right direction
+skinparam linetype ortho
+
+Usuario --|> TipoUsuario
+Usuario "1" -- "0..1" Foto
+Usuario "0..n" }--up--{ "0..n" CidadeAtendida
+Servico "1" --{ "0..n" Diaria
+Usuario "1" --{ "0..n" Diaria
+Diaria --|> DiariaStatus
+Usuario "0..n" }--up--{ "0..n" Diaria
+
+
+class Servico {
+    - Long id 
+    - String nome 
+    - BigDecimal qtdHoras
+    - Integer qtdHoras 
+    - BigDecimal porcentagemComissao
+    - Integer qtdHorasQuarto
+    - BigDecimal valorQuarto
+    - Integer qtdHorasSala
+    - BigDecimal valorSala
+    - Integer qtdHorasBanheiro
+    - BigDecimal valorBanheiro
+    - Integer qtdHorasCozinha
+    - BigDecimal valorCozinha
+    - Integer qtdHorasQuintal
+    - BigDecimal valorQuintal
+    - Integer qtdHorasOutros
+    - BigDecimal valorOutros
+    - Icone Icone
+    - Integer posicao
+
+}
+
+class Diaria {
+    - Long id
+    - LocalDate dataAtendimento
+    - Integer tempoAtendimento
+    - DiariaStatus status
+    - BigDecimal preco
+    - BigDecimal valorComissao
+
+    - String logradouro
+    - String numero
+    - String bairro
+    - String complemento
+    - String cidade
+    - String estado
+    - String cep
+    - String codigoIbge
+
+    - Integer quantidadeQuartos
+    - Integer quantidadeSalas
+    - Integer quantidadeCozinhas
+    - Integer quantidadeBanheiros
+    - Integer quantidadeQuintais
+    - Integer quantidadeOutros
+    - String observacoes
+    - String motivoCancelamento
+    
+    - Usuario cliente
+    - Usuario diarista
+    - Servico servico
+    - List<Usuario> candidatos
+  }
+
+enum DiariaStatus {
+    SEM_PAGAMENTO
+    PAGO
+    CONFIRMADO
+    CONCLUIDO
+    CANCELADO
+    AVALIADO
+    TRANSFERIDO
+}
+
+
+class Usuario {
+    - Long id
+    - String nomeCompleto
+    - String email
+    - String senha 
+    - TipoUsuario tipoUsuario 
+
+    - String cpf 
+    - LocalDate nascimento 
+    - String telefone 
+    - Double reputacao 
+    - String chavePix 
+    - Foto FotoUsuario
+    - Foto fotoDocumento
+    - List<CidadeAtendida> cidadesAtendidas
+    }
+
+class Foto {
+    - Long id 
+    - String filename 
+    - Long contentLength 
+    - String contentType 
+    - String url 
+}
+
+class CidadeAtendida {
+    - Long id
+    - String codigoIbge
+    - String cidade 
+    - String estado 
+    - List<Usuario> usuarios
+}
+
+enum TipoUsuario {
+    ADMIN
+    CLIENTE 
+    DIARISTA 
+}
+
+Servico --|> Icone 
+
+
+enum Icone {
+    TWF_CLEANING_1
+    TWF_CLEANING_2
+    TWF_CLEANING_3
+}
+
+@enduml
