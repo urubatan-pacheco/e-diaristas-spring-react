@@ -1,6 +1,6 @@
 package br.com.urubatanpacheco.ediaristas.core.models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
@@ -21,10 +21,10 @@ public class Auditable {
 
     @CreatedDate
     @Column(nullable = false)
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 
 }
