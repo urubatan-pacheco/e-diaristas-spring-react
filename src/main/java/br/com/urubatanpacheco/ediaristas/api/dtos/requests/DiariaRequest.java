@@ -7,6 +7,7 @@ import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
@@ -68,27 +69,27 @@ public class DiariaRequest {
     private String cep;
 
     @NotNull
-    @Positive 
+    @PositiveOrZero 
     private Integer quantidadeQuartos;
 
     @NotNull
-    @Positive 
+    @PositiveOrZero 
     private Integer quantidadeSalas;
 
     @NotNull
-    @Positive 
+    @PositiveOrZero 
     private Integer quantidadeCozinhas;
 
     @NotNull
-    @Positive 
+    @PositiveOrZero 
     private Integer quantidadeBanheiros;
 
     @NotNull
-    @Positive 
+    @PositiveOrZero 
     private Integer quantidadeQuintais;
 
     @NotNull
-    @Positive 
+    @PositiveOrZero 
     private Integer quantidadeOutros;
 
     @Size(max = 255)    
