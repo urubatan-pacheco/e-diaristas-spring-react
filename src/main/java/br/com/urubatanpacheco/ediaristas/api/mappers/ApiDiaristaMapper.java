@@ -11,6 +11,7 @@ import br.com.urubatanpacheco.ediaristas.core.models.Usuario;
 public interface ApiDiaristaMapper {
     ApiDiaristaMapper INSTANCE =  Mappers.getMapper(ApiDiaristaMapper.class);
 
+    @Mapping(target = "cidade", ignore = true)
     @Mapping(target = "urlFotoUsuario", source = "fotoUsuario.url")
     DiaristaLocalidadeResponse toDiaristaLocalidadeResponse(Usuario model);
 

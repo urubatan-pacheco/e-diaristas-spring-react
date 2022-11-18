@@ -17,6 +17,10 @@ public interface ApiUsuarioMapper {
     ApiUsuarioMapper  INSTANCE =  Mappers.getMapper(ApiUsuarioMapper.class);
 
     @Mapping(target = "fotoDocumento", ignore = true)
+    @Mapping(target = "cidadesAtendidas", ignore = true)
+    @Mapping(target = "fotoUsuario", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "reputacao", ignore = true)
     @Mapping(target = "senha", source = "password")
     Usuario toModel(UsuarioRequest request);
 
