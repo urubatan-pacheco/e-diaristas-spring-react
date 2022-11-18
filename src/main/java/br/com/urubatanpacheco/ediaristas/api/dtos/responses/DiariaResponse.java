@@ -69,4 +69,6 @@ public class DiariaResponse {
 
     private Long servico;
 
+    private ClienteResponse cliente;
+
 }

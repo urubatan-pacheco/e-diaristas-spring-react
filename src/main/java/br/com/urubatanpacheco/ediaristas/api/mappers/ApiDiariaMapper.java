@@ -11,7 +11,7 @@ import br.com.urubatanpacheco.ediaristas.core.models.Diaria;
 import br.com.urubatanpacheco.ediaristas.core.models.Servico;
 import br.com.urubatanpacheco.ediaristas.core.repositories.ServicoRepository;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = ApiClienteMapper.class)
 public abstract class ApiDiariaMapper {
 
     @Autowired
