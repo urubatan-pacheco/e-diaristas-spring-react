@@ -23,7 +23,6 @@ public abstract class ApiDiariaMapper {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "candidatos", ignore = true)
     @Mapping(target = "cliente", ignore = true)
-    @Mapping(target = "codigoIbge", ignore = true)
     @Mapping(target = "diarista", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "status", ignore = true)    

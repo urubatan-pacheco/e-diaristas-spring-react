@@ -13,4 +13,9 @@ public @interface EDiaristasPermissions {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
     public @interface isDiaristaOrCliente {}
+
+    @PreAuthorize("hasAuthority('CLIENTE')")
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    public @interface isCliente {}
 }
