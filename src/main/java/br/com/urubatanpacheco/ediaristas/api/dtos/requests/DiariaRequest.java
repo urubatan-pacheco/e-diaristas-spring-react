@@ -1,7 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.api.dtos.requests;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotEmpty;
@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import br.com.urubatanpacheco.ediaristas.core.validators.HoraDepoisDe;
 import br.com.urubatanpacheco.ediaristas.core.validators.ServicoExistsById;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,7 +27,8 @@ public class DiariaRequest {
     
     @NotNull
     @Future
-    private LocalDate dataAtendimento;
+    @HoraDepoisDe(min = 6)
+    private LocalDateTime dataAtendimento;
 
     @NotNull    
     @Positive
