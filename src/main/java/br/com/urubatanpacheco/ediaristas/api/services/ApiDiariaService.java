@@ -13,6 +13,7 @@ import br.com.urubatanpacheco.ediaristas.core.enums.DiariaStatus;
 import br.com.urubatanpacheco.ediaristas.core.models.Diaria;
 import br.com.urubatanpacheco.ediaristas.core.repositories.DiariaRepository;
 import br.com.urubatanpacheco.ediaristas.core.utils.SecurityUtils;
+import br.com.urubatanpacheco.ediaristas.core.validators.DiariaValidator;
 
 
 @Service
@@ -27,6 +28,9 @@ public class ApiDiariaService {
     @Autowired
     private SecurityUtils securityUtils;
 
+    @Autowired
+    private DiariaValidator validator;
+
     public DiariaResponse cadastrar(DiariaRequest request) {
 
         var model = mapper.toModel(request);
@@ -35,6 +39,8 @@ public class ApiDiariaService {
         model.setCliente(securityUtils.getUsuarioLogado());
         model.setStatus(DiariaStatus.SEM_PAGAMENTO);
 
+        validator.validar(model);
+        
         var diaria = repository.save(model);
 
         return mapper.toResponse(diaria);
