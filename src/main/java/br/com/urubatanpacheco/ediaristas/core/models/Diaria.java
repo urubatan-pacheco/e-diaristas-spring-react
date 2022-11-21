@@ -1,7 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.core.models;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -37,7 +37,7 @@ public class Diaria extends Auditable {
     private Long id;
 
     @Column(nullable = false)        
-    private LocalDate dataAtendimento;
+    private LocalDateTime dataAtendimento;
 
     @Column(nullable = false)        
     private Integer tempoAtendimento;
