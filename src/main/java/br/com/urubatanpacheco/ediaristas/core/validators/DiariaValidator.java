@@ -2,21 +2,34 @@ package br.com.urubatanpacheco.ediaristas.core.validators;
 
 import java.math.BigDecimal;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.FieldError;
 
 import br.com.urubatanpacheco.ediaristas.core.exceptions.ValidacaoException;
 import br.com.urubatanpacheco.ediaristas.core.models.Diaria;
+import br.com.urubatanpacheco.ediaristas.core.repositories.UsuarioRepository;
+import br.com.urubatanpacheco.ediaristas.core.services.consultaEndereco.adapters.EnderecoService;
+import br.com.urubatanpacheco.ediaristas.core.services.consultaEndereco.exceptions.EnderecoServiceException;
 
 
 
 @Component
 public class DiariaValidator {
 
+    @Autowired
+    private EnderecoService enderecoService;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     public void validar(Diaria diaria) {
         validarHoraTermini(diaria);
         validarTempoAtendimento(diaria);
         validarPreco(diaria);
+        validarCep(diaria);
+        validarCodigoIbge(diaria);
+        validarDisponibilidade(diaria);
     }
 
 
@@ -42,7 +55,7 @@ public class DiariaValidator {
 
         if (tempoAtendimento != tempoTotal) {
             var mensagem = "tempo de atendimento informado está incorreto";
-            var fieldError = new FieldError(diaria.getClass().getName(), "tempoAtendimento", diaria.getDataAtendimento(), false, null, null, mensagem);
+            var fieldError = new FieldError(diaria.getClass().getName(), "tempoAtendimento", diaria.getTempoAtendimento(), false, null, null, mensagem);
 
             throw new ValidacaoException(mensagem, fieldError);
         }        
@@ -68,35 +81,76 @@ public class DiariaValidator {
 
         if (preco.compareTo(valorTotal) != 0) {
             var mensagem = "valor informado está incorreto";
-            var fieldError = new FieldError(diaria.getClass().getName(), "valor", diaria.getDataAtendimento(), false, null, null, mensagem);
+            var fieldError = new FieldError(diaria.getClass().getName(), "preco", diaria.getPreco(), false, null, null, mensagem);
 
             throw new ValidacaoException(mensagem, fieldError);
         }  
     }
 
 
-        private BigDecimal calcularValorTotal(Diaria diaria) {
-            var servico = diaria.getServico();
+    private BigDecimal calcularValorTotal(Diaria diaria) {
+        var servico = diaria.getServico();
 
-            var valorMinimo = servico.getValorMinimo();
+        var valorMinimo = servico.getValorMinimo();
 
-            var valorTotal = calcularValorDoComodo(servico.getValorQuarto(), diaria.getQuantidadeQuartos())
-                .add(calcularValorDoComodo(servico.getValorSala(),diaria.getQuantidadeSalas()))
-                .add(calcularValorDoComodo(servico.getValorCozinha(),diaria.getQuantidadeCozinhas()))
-                .add(calcularValorDoComodo(servico.getValorBanheiro(),diaria.getQuantidadeBanheiros()))
-                .add(calcularValorDoComodo(servico.getValorQuintal(),diaria.getQuantidadeQuintais()))
-                .add(calcularValorDoComodo(servico.getValorOutros(),diaria.getQuantidadeOutros()));
+        var valorTotal = calcularValorDoComodo(servico.getValorQuarto(), diaria.getQuantidadeQuartos())
+            .add(calcularValorDoComodo(servico.getValorSala(),diaria.getQuantidadeSalas()))
+            .add(calcularValorDoComodo(servico.getValorCozinha(),diaria.getQuantidadeCozinhas()))
+            .add(calcularValorDoComodo(servico.getValorBanheiro(),diaria.getQuantidadeBanheiros()))
+            .add(calcularValorDoComodo(servico.getValorQuintal(),diaria.getQuantidadeQuintais()))
+            .add(calcularValorDoComodo(servico.getValorOutros(),diaria.getQuantidadeOutros()));
 
-            if (valorTotal.compareTo(valorMinimo) < 0) {
-                valorTotal = valorMinimo;
-            }
-
-            return valorTotal;
+        if (valorTotal.compareTo(valorMinimo) < 0) {
+            valorTotal = valorMinimo;
         }
 
+        return valorTotal;
+    }
 
-        private BigDecimal calcularValorDoComodo(BigDecimal valorComodo, Integer quantidade) {
-            var valor =  valorComodo.multiply(new BigDecimal(quantidade));
-            return valor;
+
+    private BigDecimal calcularValorDoComodo(BigDecimal valorComodo, Integer quantidade) {
+        var valor =  valorComodo.multiply(new BigDecimal(quantidade));
+        return valor;
+    }
+
+
+    private void validarCep(Diaria diaria) {
+        var cep  = diaria.getCep();
+
+        try {
+            enderecoService.buscarEnderecoPorCep(cep);
+        } catch(EnderecoServiceException exception) {
+            var mensagem = exception.getLocalizedMessage();
+            var fieldError = new FieldError(diaria.getClass().getName(), "cep", diaria.getCep(), false, null, null, mensagem);
+
+            throw new ValidacaoException(mensagem, fieldError);                
         }
+    }
+
+    private void validarCodigoIbge(Diaria diaria) {
+        var cep  = diaria.getCep();
+        var codigoIbge  = diaria.getCodigoIbge();
+        var codigoIbgeValido = enderecoService.buscarEnderecoPorCep(cep).getIbge();
+
+        if (!codigoIbge.equals(codigoIbgeValido)) {
+            var mensagem = "código ibge inválido";
+            var fieldError = new FieldError(diaria.getClass().getName(), "codigoIbge", diaria.getCodigoIbge(), false, null, null, mensagem);
+
+            throw new ValidacaoException(mensagem, fieldError);                
+        }
+    }
+
+    private void validarDisponibilidade(Diaria diaria) {
+        var codigoIbge = diaria.getCodigoIbge();
+
+        var disponibilidade = usuarioRepository.existsByCidadesAtendidasCodigoIbge(codigoIbge);
+
+        if (!disponibilidade) {
+            var mensagem = "não há diariastas que atendam ao CEP informado";
+            var fieldError = new FieldError(diaria.getClass().getName(), "cep", diaria.getCep(), false, null, null, mensagem);
+
+            throw new ValidacaoException(mensagem, fieldError);                  
+        }
+    }
+
 }
