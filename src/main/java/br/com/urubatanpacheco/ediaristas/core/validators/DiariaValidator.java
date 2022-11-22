@@ -7,7 +7,7 @@ import org.springframework.validation.FieldError;
 
 import br.com.urubatanpacheco.ediaristas.core.exceptions.ValidacaoException;
 import br.com.urubatanpacheco.ediaristas.core.models.Diaria;
-import br.com.urubatanpacheco.ediaristas.core.models.Servico;
+
 
 
 @Component
