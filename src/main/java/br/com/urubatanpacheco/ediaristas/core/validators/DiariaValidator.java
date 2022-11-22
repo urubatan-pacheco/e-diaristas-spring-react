@@ -1,6 +1,7 @@
 package br.com.urubatanpacheco.ediaristas.core.validators;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,7 @@ public class DiariaValidator {
         validarCep(diaria);
         validarCodigoIbge(diaria);
         validarDisponibilidade(diaria);
+        validarDataAtendimento(diaria);
     }
 
 
@@ -153,4 +155,17 @@ public class DiariaValidator {
         }
     }
 
+
+    private void validarDataAtendimento(Diaria diaria) {
+        var dataAtendimento =  diaria.getDataAtendimento();
+        var dataAtendimentoMinima = LocalDateTime.now().plusHours(48);
+
+        if (dataAtendimento.isBefore(dataAtendimentoMinima)) {
+            var mensagem = "a data de atendimento deve ter pelo menos 48h à partir de agora";
+            var fieldError = new FieldError(diaria.getClass().getName(), "dataAtendimento", diaria.getDataAtendimento(), false, null, null, mensagem);
+
+            throw new ValidacaoException(mensagem, fieldError);
+        }        
+    }
+ 
 }
