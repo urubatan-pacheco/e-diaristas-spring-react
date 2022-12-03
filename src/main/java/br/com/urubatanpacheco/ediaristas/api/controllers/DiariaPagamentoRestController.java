@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.PagamentoRequest;
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.MensagemResponse;
 import br.com.urubatanpacheco.ediaristas.api.services.ApiDiariaPagamentoService;
+import br.com.urubatanpacheco.ediaristas.core.permissions.EDiaristasPermissions;
 
 @RestController
 @RequestMapping("/api/diarias/{id}")
@@ -20,6 +21,7 @@ public class DiariaPagamentoRestController {
     private ApiDiariaPagamentoService service;
 
     @PostMapping("/pagar")
+    @EDiaristasPermissions.isClienteDaDiaria
     public MensagemResponse pagar(@RequestBody @Valid PagamentoRequest request, @PathVariable Long id) {
         return service.pagar(request, id);
     }
