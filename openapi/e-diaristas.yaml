@@ -279,7 +279,7 @@ paths:
     post:
       operationId: postDiaria
       tags:
-        - Diária
+        - Diárias
       description: cadastrar una diária
       requestBody:
         content:
@@ -293,6 +293,52 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/DiariaResponse'
+        '400':
+          description: houveram erros de validação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: usuário não está autenticado
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: usuário autenticado não tem acesso para realizar esta operação
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      security:
+        - JWT: []
+  /api/diarias/{diariaId}/pagar:
+    post:
+      operationId: pagarDiaria
+      tags:
+        - Diárias
+      description: Realizar pagamento de una diária
+      parameters:
+        - name: diariaId
+          in: path
+          description: ID da diária a ser paga
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/PagamentoRequest'
+      responses:
+        '200':
+          description: diária paga com sucesso
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
         '400':
           description: houveram erros de validação
           content:
@@ -684,3 +730,15 @@ components:
           type: string
         reputacao:
           type: integer
+    PagamentoRequest:
+      required:
+        - card_hash
+      type: object
+      properties:
+        card_hash:
+          type: string
+    MessageResponse:
+      type: object
+      properties:
+        mensagem:
+          type: string
