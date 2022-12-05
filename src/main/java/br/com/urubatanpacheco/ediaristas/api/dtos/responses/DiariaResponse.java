@@ -4,18 +4,22 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
+import br.com.urubatanpacheco.ediaristas.core.enums.DiariaStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper =  false)
 @JsonNaming(SnakeCaseStrategy.class)
-public class DiariaResponse {
+public class DiariaResponse extends HateoasResponse {
 
     private Long id;
 
@@ -72,4 +76,9 @@ public class DiariaResponse {
     private UsuarioDiariaResponse cliente;
 
     private UsuarioDiariaResponse diarista;
+
+    @JsonIgnore
+    public Boolean isSemPagamento() { 
+        return status.equals(DiariaStatus.SEM_PAGAMENTO.getId());
+    } 
 }
