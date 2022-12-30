@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @JsonNaming(SnakeCaseStrategy.class)
 public class UsuarioCadastroResponse extends UsuarioResponse {
 
-    private String access;
+    private TokenResponse token;
 
-    private String refresh;
 }

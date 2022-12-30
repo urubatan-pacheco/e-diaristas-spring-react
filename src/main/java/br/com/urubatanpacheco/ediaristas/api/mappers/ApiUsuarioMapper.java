@@ -36,8 +36,7 @@ public interface ApiUsuarioMapper {
     UsuarioResponse toResponse(Usuario usuario);
 
     @Mapping(target = "tipoUsuario", source = "tipoUsuario.id")
-    @Mapping(target = "access", ignore = true)
-    @Mapping(target = "refresh", ignore = true)
     @Mapping(target = "links", ignore = true)
+    @Mapping(target = "token", ignore = true)
     UsuarioCadastroResponse toCadastroResponse(Usuario usuario);
 }

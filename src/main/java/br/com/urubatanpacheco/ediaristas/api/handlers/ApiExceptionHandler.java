@@ -29,6 +29,39 @@ import br.com.urubatanpacheco.ediaristas.core.services.token.exceptions.TokenSer
 @RestControllerAdvice(annotations = RestController.class)
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
     private SnakeCaseStrategy camelCaseToSnakeCase =  new SnakeCaseStrategy();
+
+    @ExceptionHandler(EnderecoServiceException.class)
+    public ResponseEntity<Object> handleEnderecoServiceException(EnderecoServiceException exception, HttpServletRequest request) {
+        return criarErroResponse(HttpStatus.BAD_REQUEST, exception.getLocalizedMessage(), request.getRequestURI());
+    }    
+
+
+    @ExceptionHandler(ValidacaoException.class)
+    public  ResponseEntity<Object> handleValidacaoException(ValidacaoException exception) {
+        var body = new HashMap<String, List<String>>();
+        var fieldError = exception.getFieldError();
+        var fieldErrors = new ArrayList<String>();
+
+        fieldErrors.add(fieldError.getDefaultMessage());
+        var field = camelCaseToSnakeCase.translate(fieldError.getField());
+
+        body.put(field, fieldErrors );
+                return ResponseEntity.badRequest().body(body);
+    }
+
+
+    @ExceptionHandler(TokenServiceException.class)
+    public  ResponseEntity<Object>  handleTokenServiceException(TokenServiceException exception, HttpServletRequest request) {
+        return criarErroResponse(HttpStatus.UNAUTHORIZED, exception.getLocalizedMessage(), request.getRequestURI());
+    }
+
+    @ExceptionHandler(TokenNaBlackListException.class)
+    public  ResponseEntity<Object> handleTokenNaBlackListException(TokenNaBlackListException exception, HttpServletRequest request) {
+        return criarErroResponse(HttpStatus.UNAUTHORIZED, exception.getLocalizedMessage(), request.getRequestURI());
+    }
+
+
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
         MethodArgumentNotValidException ex,
@@ -60,41 +93,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.badRequest().body(body);
     }
 
-
-
-
-    @ExceptionHandler(ValidacaoException.class)
-    public  ResponseEntity<Object> handleValidacaoException(ValidacaoException exception) {
-        var body = new HashMap<String, List<String>>();
-        var fieldError = exception.getFieldError();
-        var fieldErrors = new ArrayList<String>();
-
-        fieldErrors.add(fieldError.getDefaultMessage());
-        var field = camelCaseToSnakeCase.translate(fieldError.getField());
-
-        body.put(field, fieldErrors );
-
-
-        return ResponseEntity.badRequest().body(body);
-    }
-
-
-    @ExceptionHandler(EnderecoServiceException.class)
-    public  ResponseEntity<Object> handleEnderecoServiceException(EnderecoServiceException exception, HttpServletRequest request) {
-        return criarErroResponse(HttpStatus.BAD_REQUEST, exception.getLocalizedMessage(), request.getRequestURI());
-    }
-
-    @ExceptionHandler(TokenServiceException.class)
-    public  ResponseEntity<Object> handleEnderecoServiceException(TokenServiceException exception, HttpServletRequest request) {
-        return criarErroResponse(HttpStatus.UNAUTHORIZED, exception.getLocalizedMessage(), request.getRequestURI());
-    }
-
-    @ExceptionHandler(TokenNaBlackListException.class)
-    public  ResponseEntity<Object> handleTokenNaBlackListException(TokenNaBlackListException exception, HttpServletRequest request) {
-        return criarErroResponse(HttpStatus.UNAUTHORIZED, exception.getLocalizedMessage(), request.getRequestURI());
-    }
-
-    private ResponseEntity<Object> criarErroResponse(HttpStatus status, String message, String path) {
+        private ResponseEntity<Object> criarErroResponse(HttpStatus status, String message, String path) {
         var errorResponse = ErrorResponse.builder()
             .status(status.value())
             .timestamp(LocalDateTime.now())
@@ -102,8 +101,10 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
             .path(path)
             .build();
 
-        return ResponseEntity.badRequest().body(errorResponse);
+        return new ResponseEntity<>(errorResponse, status);
     }  
+
+
     
     
 }

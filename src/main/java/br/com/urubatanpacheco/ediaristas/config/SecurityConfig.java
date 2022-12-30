@@ -3,7 +3,6 @@ package br.com.urubatanpacheco.ediaristas.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -22,7 +21,7 @@ import br.com.urubatanpacheco.ediaristas.core.enums.TipoUsuario;
 import br.com.urubatanpacheco.ediaristas.core.filters.AccessTokenRequestFilter;
 
 
-@Configuration
+
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {

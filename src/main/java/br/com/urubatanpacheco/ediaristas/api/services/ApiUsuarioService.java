@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 
 import br.com.urubatanpacheco.ediaristas.api.dtos.requests.UsuarioRequest;
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioCadastroResponse;
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.TokenResponse;
 import br.com.urubatanpacheco.ediaristas.api.dtos.responses.UsuarioResponse;
 import br.com.urubatanpacheco.ediaristas.api.mappers.ApiUsuarioMapper;
 import br.com.urubatanpacheco.ediaristas.core.exceptions.SenhasNaoConferemException;
@@ -64,11 +65,11 @@ public class ApiUsuarioService {
         return usuarioResponse;
     }
 
-    private void gerarTokenResponse(UsuarioCadastroResponse usuarioResponse) {
-        var email = usuarioResponse.getEmail();
-
-        usuarioResponse.setAccess(tokenService.gerarAccessToken(email));
-        usuarioResponse.setRefresh(tokenService.gerarRefreshToken(email));
+    private TokenResponse gerarTokenResponse(UsuarioCadastroResponse response) {
+        var token = tokenService.gerarAccessToken(response.getEmail());
+        var refresh = tokenService.gerarRefreshToken(response.getEmail());
+        var tokenResponse = new TokenResponse(token, refresh);
+        return tokenResponse;
     }
 
     private Double calcularReputacaoDiaristas() {
