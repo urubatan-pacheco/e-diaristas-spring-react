@@ -32,6 +32,7 @@ public abstract class ApiDiariaMapper {
     @Mapping(target = "status", source = "status.id")
     @Mapping(target = "nomeServico", source = "servico.nome")
     @Mapping(target = "servico", source = "servico.id")
+    @Mapping(target = "links", ignore = true)      
     public abstract DiariaResponse toResponse(Diaria model);    
     
     protected Servico longToServico(Long servicoId) {
