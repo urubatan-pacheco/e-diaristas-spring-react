@@ -31,7 +31,7 @@ public class ApiAuthService {
 
     public TokenResponse autenticar(TokenRequest tokenRequest) {
         var email = tokenRequest.getEmail();
-        var senha = tokenRequest.getSenha();
+        var senha = tokenRequest.getPassword();
 
         var autenticacao = new UsernamePasswordAuthenticationToken(email, senha);
         authenticationManager.authenticate(autenticacao);
