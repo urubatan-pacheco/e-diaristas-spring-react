@@ -3,6 +3,7 @@ package br.com.urubatanpacheco.ediaristas.api.handlers;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.AbstractMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 
     @ExceptionHandler(ValidacaoException.class)
-    public  ResponseEntity<Object> handleValidacaoException(ValidacaoException exception) {
+    public  ResponseEntity<Object> handleValidacaoException(ValidacaoException exception, HttpServletRequest request) {
         var body = new HashMap<String, List<String>>();
         var fieldError = exception.getFieldError();
         var fieldErrors = new ArrayList<String>();
@@ -46,7 +47,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         var field = camelCaseToSnakeCase.translate(fieldError.getField());
 
         body.put(field, fieldErrors );
-                return ResponseEntity.badRequest().body(body);
+
+        return criarErroResponse(HttpStatus.BAD_REQUEST, exception.getLocalizedMessage(), request.getRequestURI(), body);
     }
 
 
@@ -93,12 +95,17 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
                 return ResponseEntity.badRequest().body(body);
     }
 
-        private ResponseEntity<Object> criarErroResponse(HttpStatus status, String message, String path) {
+    private ResponseEntity<Object> criarErroResponse(HttpStatus status, String message, String path) {
+        return criarErroResponse( status,  message,  path, null);
+    }
+
+        private ResponseEntity<Object> criarErroResponse(HttpStatus status, String message, String path,AbstractMap<String, List<String>> errors) {
         var errorResponse = ErrorResponse.builder()
             .status(status.value())
             .timestamp(LocalDateTime.now())
             .message(message)
             .path(path)
+            .errors(errors)
             .build();
 
         return new ResponseEntity<>(errorResponse, status);

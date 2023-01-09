@@ -1,6 +1,8 @@
 package br.com.urubatanpacheco.ediaristas.api.dtos.responses;
 
 import java.time.LocalDateTime;
+import java.util.AbstractMap;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,4 +22,6 @@ public class ErrorResponse {
     private String message;
 
     private String path;
+
+    private AbstractMap<String, List<String>> errors;
 }
