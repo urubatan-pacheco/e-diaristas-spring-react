@@ -22,7 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import br.com.urubatanpacheco.ediaristas.api.dtos.responses.ErrorResponse;
+import br.com.urubatanpacheco.ediaristas.api.dtos.responses.ErrorTokenResponse;
 import br.com.urubatanpacheco.ediaristas.core.services.token.adapters.TokenService;
 import br.com.urubatanpacheco.ediaristas.core.services.token.exceptions.TokenServiceException;
 
@@ -34,6 +34,7 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
     private final static String TOKEN_TYPE = "Bearer ";
 
     private final static String AUTHORIZATION_HEADER_FIELD_NAME = "Authorization";
+    
 
     @Autowired
     private TokenService tokenService;
@@ -54,9 +55,10 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
                 tryDoFilterInternal(request, response, filterChain);
             } catch (TokenServiceException exception) {
                 var status = HttpStatus.UNAUTHORIZED; // 401
-                var errorResponse =  ErrorResponse
+                var errorResponse =  ErrorTokenResponse
                     .builder()
                     .status(status.value())
+                    .code(ErrorTokenResponse.TOKEN_NOT_VALID)
                     .timestamp(LocalDateTime.now())
                     .message(exception.getLocalizedMessage())
                     .path(request.getRequestURI())
@@ -76,7 +78,8 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
             throws IOException, ServletException {
         var token = "";
         var email = "";
-        System.out.println("AccessTokenRequest.doFilter request:"+request);
+
+        System.out.println("AccessTokenRequest.doFilter request.requestURI:"+request.getRequestURI());
         var authorizationHeader = request.getHeader(AUTHORIZATION_HEADER_FIELD_NAME);
 
         System.out.println("AccessTokenRequest.doFilter (authorization):("+authorizationHeader+")");
@@ -91,7 +94,7 @@ public class AccessTokenRequestFilter extends OncePerRequestFilter {
 
         if (isEmailNotInContext(email)) {
             addEmailInContext(request, email);
-           System.out.println("AccessTokenRequest.doFilter added to context"+email);
+           System.out.println("AccessTokenRequest.doFilter added to context email:"+email);
 
         }
 
